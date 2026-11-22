@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bima Surya Adiraja Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Sora:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout idea: a mission-control HUD floating over deep space; content sits in asymmetric panels, the person is the planet at the centre of each orbit. */
+  --void:#04050c;
+  --deep:#0b0e1f;
+  --panel:rgba(18,22,48,.55);
+  --ink:#eef0ff;
+  --dim:#8d93bd;
+  --flare:#ff4d2e;
+  --ion:#7cc4ff;
+  --line:rgba(124,196,255,.18);
+  --display:"Unbounded","Arial Black",Impact,sans-serif;
+  --body:"Sora","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;background:var(--void)}
+html,body{overflow-x:clip}
+body{background:var(--void);color:var(--ink);font-family:var(--body);font-weight:300;line-height:1.65}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ion);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);line-height:1.05;text-wrap:balance;letter-spacing:-.01em}
+
+/* ---------- background layers ---------- */
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.nebula{position:fixed;inset:-20%;z-index:0;pointer-events:none;
+  background:
+   radial-gradient(40% 35% at 78% 18%,rgba(255,77,46,.16),transparent 70%),
+   radial-gradient(45% 40% at 12% 70%,rgba(124,196,255,.13),transparent 70%),
+   radial-gradient(30% 30% at 55% 95%,rgba(150,90,255,.12),transparent 70%);
+  animation:drift 40s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(-4%,3%,0) scale(1.08)}}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#cursor{position:fixed;width:320px;height:320px;border-radius:50%;pointer-events:none;z-index:1;left:0;top:0;
+  background:radial-gradient(circle,rgba(124,196,255,.10),transparent 65%);transform:translate(-50%,-50%);transition:opacity .3s}
+main,nav,footer{position:relative;z-index:2}
+
+/* ---------- nav ---------- */
+#fuel{position:fixed;top:0;left:0;height:2px;width:0;z-index:50;background:linear-gradient(90deg,var(--ion),var(--flare));box-shadow:0 0 12px var(--flare)}
+nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px clamp(16px,4vw,48px);backdrop-filter:blur(14px);background:rgba(4,5,12,.55);border-bottom:1px solid var(--line)}
+.logo{font-family:var(--display);font-weight:900;font-size:15px;letter-spacing:.04em;text-decoration:none}
+.logo span{color:var(--flare)}
+nav ul{display:flex;gap:clamp(12px,2.4vw,30px);list-style:none}
+nav ul a{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--dim);transition:color .2s}
+nav ul a:hover,nav ul a.on{color:var(--ink)}
+nav ul a.on::before{content:"▸ ";color:var(--flare)}
+.clock{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.1em;white-space:nowrap}
+.clock b{color:#4dff9a;font-weight:400}
+
+/* ---------- shared ---------- */
+section{padding:clamp(72px,10vw,130px) clamp(16px,5vw,64px);max-width:1280px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ion);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--ion)}
+.h2{font-size:clamp(34px,6vw,76px);font-weight:900;text-transform:uppercase}
+.h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.4px var(--ink)}
+.lead{color:var(--dim);max-width:62ch;margin-top:18px;font-size:17px}
+.reveal{opacity:.2;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(10px);position:relative}
+.panel::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(135deg,rgba(124,196,255,.35),transparent 30%,transparent 70%,rgba(255,77,46,.3));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px}
+
+/* ---------- hero ---------- */
+.hero{overflow:clip;position:relative;display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:24px;min-height:min(820px,92vh);padding-top:40px;padding-bottom:40px}
+.hero .coords{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.14em;margin-bottom:26px}
+.hero .coords b{color:var(--flare);font-weight:400}
+.name{font-size:clamp(46px,8.4vw,124px);font-weight:900;text-transform:uppercase;line-height:.92}
+.name .row{display:block}
+.name .out{color:transparent;-webkit-text-stroke:1.6px var(--ink)}
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-t);position:absolute;inset:0;opacity:0}
+.glitch::before{color:var(--flare);animation:g1 5s infinite steps(1)}
+.glitch::after{color:var(--ion);animation:g2 5s infinite steps(1)}
+@keyframes g1{0%,92%,100%{opacity:0;transform:none;clip-path:none}93%{opacity:.85;transform:translate(-4px,2px);clip-path:inset(10% 0 55% 0)}95%{opacity:.85;transform:translate(3px,-2px);clip-path:inset(60% 0 8% 0)}97%{opacity:0}}
+@keyframes g2{0%,92%,100%{opacity:0;transform:none;clip-path:none}94%{opacity:.85;transform:translate(4px,1px);clip-path:inset(40% 0 30% 0)}96%{opacity:.85;transform:translate(-3px,-1px);clip-path:inset(5% 0 75% 0)}98%{opacity:0}}
+.role{font-family:var(--mono);font-size:clamp(14px,1.6vw,18px);margin-top:28px;color:var(--ink);min-height:1.6em}
+.role .pre{color:var(--dim)}
+.role .caret{display:inline-block;width:.6em;height:1.1em;background:var(--flare);vertical-align:-.18em;margin-left:3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
+.btn{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;padding:15px 24px;border-radius:999px;border:1px solid var(--line);transition:transform .25s,box-shadow .25s,background .25s;display:inline-flex;gap:10px;align-items:center;cursor:pointer;background:transparent;color:var(--ink)}
+.btn.primary{background:var(--flare);border-color:var(--flare);color:#fff;box-shadow:0 0 0 rgba(255,77,46,0)}
+.btn:hover{transform:translateY(-3px)}
+.btn.primary:hover{box-shadow:0 10px 40px rgba(255,77,46,.55)}
+.btn:not(.primary):hover{background:rgba(124,196,255,.08)}
+.astro{position:relative;aspect-ratio:1/1.05;display:grid;place-items:end center}
+.planet{position:absolute;width:78%;aspect-ratio:1;border-radius:50%;top:8%;left:11%;
+  background:radial-gradient(circle at 32% 28%,#ff8a5c 0%,var(--flare) 28%,#7a1410 62%,#1c0306 100%);
+  box-shadow:0 0 90px rgba(255,77,46,.45),inset -30px -40px 80px rgba(0,0,0,.6)}
+.ring{position:absolute;border:1px solid var(--line);border-radius:50%;left:50%;top:46%;transform:translate(-50%,-50%) rotateX(72deg)}
+.ring.r1{width:118%;aspect-ratio:1;animation:spin 26s linear infinite}
+.ring.r2{width:140%;aspect-ratio:1;border-style:dashed;animation:spin 48s linear infinite reverse}
+.ring::after{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:var(--ion);box-shadow:0 0 16px var(--ion);top:-5px;left:50%}
+@keyframes spin{to{transform:translate(-50%,-50%) rotateX(72deg) rotate(360deg)}}
+.astro img{position:relative;width:86%;filter:drop-shadow(0 30px 40px rgba(0,0,0,.6));animation:float 7s ease-in-out infinite;
+  -webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+@keyframes float{50%{transform:translateY(-14px)}}
+.tag{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:.12em;padding:8px 12px;border-radius:8px;background:rgba(4,5,12,.7);border:1px solid var(--line);backdrop-filter:blur(8px);white-space:nowrap;z-index:3}
+.tag b{color:var(--flare);font-weight:600}
+.tag.t1{top:14%;left:-4%}.tag.t2{top:52%;right:-6%}.tag.t3{bottom:10%;left:2%}
+.scroll-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--dim);display:flex;flex-direction:column;align-items:center;gap:8px}
+.scroll-hint i{width:1px;height:38px;background:linear-gradient(var(--ion),transparent);animation:drip 2s infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- marquee ---------- */
+.marquee{position:relative;z-index:2;border-block:1px solid var(--line);overflow:hidden;padding:18px 0;background:rgba(255,77,46,.04)}
+.marquee .track{display:flex;gap:48px;width:max-content;animation:slide 32s linear infinite;font-family:var(--display);font-weight:700;font-size:clamp(18px,2.4vw,28px);text-transform:uppercase;white-space:nowrap}
+.marquee span:nth-child(even){color:transparent;-webkit-text-stroke:1px var(--dim)}
+.marquee span::after{content:"✦";margin-left:48px;color:var(--flare);-webkit-text-stroke:0}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* ---------- about ---------- */
+.about{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(28px,5vw,72px);align-items:center}
+.portrait{position:relative;padding:28px 28px 0;overflow:hidden}
+.portrait .halo{position:absolute;width:80%;aspect-ratio:1;border-radius:50%;left:10%;top:12%;background:radial-gradient(circle,rgba(124,196,255,.35),transparent 65%)}
+.portrait img{position:relative;margin:0 auto;width:88%}
+.portrait .id{position:absolute;left:18px;top:16px;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.14em;line-height:1.7}
+.portrait .id b{color:var(--ink);font-weight:400}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:36px}
+.stat{padding:18px 16px}
+.stat .n{font-family:var(--display);font-weight:900;font-size:clamp(26px,3.2vw,40px);font-variant-numeric:tabular-nums;color:var(--ink)}
+.stat .n small{font-size:.5em;color:var(--dim)}
+.stat .l{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:4px;line-height:1.4}
+.edu{margin-top:14px;padding:22px 24px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.edu h3{font-size:17px;font-weight:700}
+.edu p{color:var(--dim);font-size:14px}
+.edu .gpa{font-family:var(--mono);font-size:13px;color:#4dff9a;border:1px solid rgba(77,255,154,.35);padding:6px 12px;border-radius:999px}
+
+/* ---------- skills orbit ---------- */
+.skills{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:center}
+.orbit{position:relative;aspect-ratio:1;max-width:460px;width:100%;margin:0 auto}
+.orbit .core{position:absolute;inset:38%;border-radius:50%;display:grid;place-items:center;text-align:center;
+  background:radial-gradient(circle at 35% 30%,#2a3570,#0b0e1f 70%);box-shadow:0 0 60px rgba(124,196,255,.3);font-family:var(--display);font-weight:900;font-size:clamp(12px,1.6vw,16px);line-height:1.2}
+.orbit .path{position:absolute;border:1px solid var(--line);border-radius:50%}
+.orbit .p1{inset:27%}.orbit .p2{inset:15%}.orbit .p3{inset:5%;border-style:dashed}
+.orbit .arm{position:absolute;inset:0;animation:rot var(--t) linear infinite;animation-delay:var(--d)}
+.orbit .arm .sat{position:absolute;left:50%;top:var(--y);transform:translate(-50%,-50%)}
+.orbit .sat span{animation:rot var(--t) linear infinite reverse;animation-delay:var(--d)}
+@keyframes rot{to{transform:rotate(360deg)}}
+.sat span{display:block;width:var(--s);height:var(--s);border-radius:24%;box-shadow:0 0 28px var(--c),0 10px 24px rgba(0,0,0,.5);transition:transform .3s}
+.sat span img{width:100%;height:100%;border-radius:24%}
+.orbit:hover .arm,.orbit:hover .sat span{animation-play-state:paused}
+.sat span:hover{transform:scale(1.15)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.chip{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:9px 14px;border-radius:999px;border:1px solid var(--line);color:var(--ink);transition:border-color .2s,background .2s,transform .2s}
+.chip:hover{border-color:var(--flare);background:rgba(255,77,46,.1);transform:translateY(-2px)}
+.skills h3{font-size:14px;font-family:var(--mono);font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--flare);margin-top:30px}
+
+/* ---------- mission log ---------- */
+.log{position:relative;margin-top:56px;display:grid;gap:18px}
+.log::before{content:"";position:absolute;left:19px;top:8px;bottom:8px;width:1px;background:linear-gradient(var(--flare),var(--ion),transparent)}
+.mission{position:relative;padding-left:60px}
+.mission .dot{position:absolute;left:12px;top:30px;width:15px;height:15px;border-radius:50%;background:var(--void);border:2px solid var(--flare);box-shadow:0 0 0 6px rgba(255,77,46,.12)}
+.mission.past .dot{border-color:var(--ion);box-shadow:0 0 0 6px rgba(124,196,255,.1)}
+.mission .card{padding:24px 26px;transition:transform .35s,border-color .35s}
+.mission .card:hover{transform:translateX(6px)}
+.mission .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.mission h3{font-size:clamp(17px,2vw,21px);font-weight:700}
+.mission .when{font-family:var(--mono);font-size:12px;color:var(--flare);letter-spacing:.12em;white-space:nowrap}
+.mission.past .when{color:var(--ion)}
+.mission .org{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.06em;margin-top:6px;text-transform:uppercase}
+.mission ul{margin-top:12px;padding-left:18px;color:#c6cae6;font-size:15px;display:grid;gap:4px}
+.mission li::marker{color:var(--flare)}
+.log-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+/* ---------- achievements ---------- */
+.ach{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:52px}
+.award{grid-column:span 2;padding:24px 22px 22px;overflow:hidden;transition:transform .35s}
+.award.big{grid-column:span 3}
+.award.wide{grid-column:1/-1}
+.award:hover{transform:translateY(-6px)}
+.award .rank{font-family:var(--display);font-weight:900;font-size:clamp(34px,4vw,54px);line-height:1;background:linear-gradient(180deg,var(--ink),rgba(238,240,255,.25));-webkit-background-clip:text;background-clip:text;color:transparent}
+.award .rank.gold{background-image:linear-gradient(180deg,#ffe08a,#ff9a3c)}
+.award .rank.silver{background-image:linear-gradient(180deg,#f2f5ff,#8d93bd)}
+.award .rank.bronze{background-image:linear-gradient(180deg,#ffc19a,#b4552f)}
+.award h3{font-size:15px;font-weight:700;margin-top:12px;line-height:1.35;font-family:var(--body)}
+.award .meta{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+.award .cat{color:var(--ion)}
+.award .spark{position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,77,46,.35),transparent 65%);transition:transform .5s}
+.award:hover .spark{transform:scale(1.6)}
+
+/* ---------- works ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
+.filters button{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer;transition:all .2s}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--void);border-color:var(--ink)}
+.filters button:hover{color:var(--ink)}
+.grid{columns:3 280px;column-gap:16px;margin-top:28px}
+.work{break-inside:avoid;margin-bottom:16px;cursor:zoom-in;transform-style:preserve-3d;transition:transform .2s ease-out,opacity .4s}
+.work.hide{display:none}
+.work .frame{overflow:hidden;border-radius:14px;border:1px solid var(--line);background:#0b0e1f;position:relative}
+.work .frame.light{background:linear-gradient(160deg,#1a2050,#0b0e1f)}
+.work .frame.light img{padding:14% 10%}
+.work img{width:100%;transition:transform .6s}
+.work:hover img{transform:scale(1.05)}
+.work .shine{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.22),transparent 45%)}
+.work:hover .shine{opacity:1}
+.work .cap{display:flex;justify-content:space-between;gap:10px;padding:12px 4px 0;align-items:baseline}
+.work .cap h3{font-family:var(--body);font-size:15px;font-weight:600;letter-spacing:0}
+.work .cap span{font-family:var(--mono);font-size:11px;color:var(--flare);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.work .cap p{color:var(--dim);font-size:13px}
+.work .vlink{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--ion)}
+.work .vlink.soon{color:var(--dim)}
+.play{position:absolute;inset:auto auto 14px 14px;width:44px;height:44px;border-radius:50%;background:var(--flare);display:grid;place-items:center;box-shadow:0 0 24px rgba(255,77,46,.7)}
+.play::after{content:"";border-left:13px solid #fff;border-block:8px solid transparent;margin-left:3px}
+
+/* ---------- lightbox ---------- */
+#lb{position:fixed;inset:0;z-index:100;background:rgba(4,5,12,.92);backdrop-filter:blur(10px);display:none;place-items:center;padding:4vw}
+#lb.open{display:grid;animation:fade .3s}
+@keyframes fade{from{opacity:0}}
+#lb figure{max-width:min(1000px,100%);max-height:100%;display:grid;gap:14px;justify-items:center}
+#lb img{max-height:78vh;width:auto;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+#lb figcaption{font-family:var(--mono);font-size:13px;color:var(--dim);text-align:center}
+#lb button{position:absolute;top:18px;right:18px;font-family:var(--mono);background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:10px 16px;cursor:pointer}
+
+/* ---------- contact ---------- */
+.contact{text-align:left;position:relative;overflow:hidden}
+.thanks{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:end}
+.big-ty{font-size:clamp(56px,12vw,170px);font-weight:900;text-transform:uppercase;line-height:.88}
+.big-ty .out{color:transparent;-webkit-text-stroke:2px var(--flare)}
+.thanks img{width:80%;margin-left:auto;filter:drop-shadow(0 0 50px rgba(255,77,46,.35));-webkit-mask-image:linear-gradient(#000 80%,transparent);mask-image:linear-gradient(#000 80%,transparent)}
+.channels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:40px}
+.channel{padding:20px 22px;text-decoration:none;display:flex;flex-direction:column;gap:6px;transition:transform .3s}
+.channel:hover{transform:translateY(-4px)}
+.channel .k{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase}
+.channel .v{font-weight:600;font-size:16px;word-break:break-word}
+.channel .v.copy{cursor:pointer}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;z-index:120;font-family:var(--mono);font-size:13px;background:var(--ink);color:var(--void);padding:10px 18px;border-radius:999px;transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{border-top:1px solid var(--line);padding:22px clamp(16px,5vw,64px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  nav ul{display:none}
+  .hero,.about,.skills,.thanks{grid-template-columns:1fr}
+  .astro{max-width:440px;margin:0 auto;width:100%}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .log-grid{grid-template-columns:1fr}
+  .ach{grid-template-columns:1fr 1fr}
+  .award,.award.big{grid-column:span 1}
+  .award.wide{grid-column:1/-1}
+  .thanks img{width:60%;margin:0 auto}
+  .tag.t1{left:0}.tag.t2{right:0}
+}
+@media (max-width:480px){
+  .ach{grid-template-columns:1fr}
+  .clock{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="nebula" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div id="cursor" aria-hidden="true"></div>
+<div id="fuel" aria-hidden="true"></div>
+
+<nav>
+  <a class="logo" href="#top">BIMA<span>.</span>SA</a>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#missions">Experience</a></li>
+    <li><a href="#awards">Awards</a></li>
+    <li><a href="#works">Works</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="clock"><b>●</b> SURABAYA · <span id="time">--:--</span> WIB</div>
+</nav>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="coords reveal">7.2575° S, 112.7521° E &nbsp;/&nbsp; <b>OPEN FOR INTERNSHIP</b></div>
+    <h1 class="name reveal">
+      <span class="row glitch" data-t="Bima">Bima</span>
+      <span class="row out">Surya</span>
+      <span class="row glitch" data-t="Adiraja">Adiraja</span>
+    </h1>
+    <p class="role reveal"><span class="pre">&gt; </span><span id="type">Industrial Engineering Student</span><span class="caret"></span></p>
+    <div class="cta reveal">
+      <a class="btn primary" href="#works">Explore my works ↗</a>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+  </div>
+  <div class="astro reveal">
+    <div class="planet"></div>
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <img src="img/hero_think.webp" alt="Bima Surya Adiraja in a maroon blazer, looking up thoughtfully">
+    <div class="tag t1">GPA <b>3.80</b> / 4.00</div>
+    <div class="tag t2">PKM-VGK <b>FUNDED</b> 2026</div>
+    <div class="tag t3">TELKOM UNIVERSITY <b>SURABAYA</b></div>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">SCROLL<i></i></div>
+</section>
+</main>
+
+<div class="marquee" aria-hidden="true">
+  <div class="track">
+    <span>Industrial Engineering</span><span>Graphic Design</span><span>Content Creation</span><span>Video Editing</span><span>Event Management</span><span>Leadership</span>
+    <span>Industrial Engineering</span><span>Graphic Design</span><span>Content Creation</span><span>Video Editing</span><span>Event Management</span><span>Leadership</span>
+  </div>
+</div>
+
+<main>
+<!-- ABOUT -->
+<section id="about" class="about">
+  <div class="portrait panel reveal">
+    <div class="halo"></div>
+    <div class="id">CREW ID · 001<br><b>BIMA SURYA ADIRAJA</b><br>S1 INDUSTRIAL ENG.</div>
+    <img src="img/about_cross.webp" alt="Bima standing with arms crossed">
+  </div>
+  <div>
+    <div class="eyebrow reveal">01 · Crew Profile</div>
+    <h2 class="h2 reveal">Hello, I'm <em>Bima</em></h2>
+    <p class="lead reveal">I'm an Industrial Engineering student at Telkom University Surabaya who is starting my journey in design. I enjoy learning new things, exploring creative ideas, and turning simple concepts into meaningful visual experiences. My engineering side keeps things organised, and my design side makes them worth looking at.</p>
+    <div class="stats">
+      <div class="stat panel reveal"><div class="n" data-count="3.80" data-dec="2">3.80</div><div class="l">GPA out of 4.00</div></div>
+      <div class="stat panel reveal"><div class="n" data-count="8">8</div><div class="l">Organisations &amp; projects</div></div>
+      <div class="stat panel reveal"><div class="n" data-count="9">9</div><div class="l">Awards &amp; recognitions</div></div>
+      <div class="stat panel reveal"><div class="n" data-count="3">3</div><div class="l">Creative tools</div></div>
+    </div>
+    <div class="edu panel reveal">
+      <div>
+        <h3>Telkom University Surabaya</h3>
+        <p>Bachelor of Industrial Engineering · 2025 – 2029 (expected) · Surabaya, East Java</p>
+      </div>
+      <span class="gpa">GPA 3.80 / 4.00</span>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="skills">
+  <div class="orbit reveal" aria-label="Software skills: Figma, Canva, CapCut">
+    <div class="path p1"></div><div class="path p2"></div><div class="path p3"></div>
+    <div class="core">SKILL<br>SYSTEM</div>
+    <div class="arm" style="--t:18s;--d:-2s"><div class="sat" style="--y:27%"><span style="--s:78px;--c:rgba(162,89,255,.55)"><img src="img/app_figma.webp" alt="Figma" title="Figma"></span></div></div>
+    <div class="arm" style="--t:30s;--d:-11s"><div class="sat" style="--y:15%"><span style="--s:84px;--c:rgba(0,196,204,.55)"><img src="img/app_canva.webp" alt="Canva" title="Canva"></span></div></div>
+    <div class="arm" style="--t:44s;--d:-30s"><div class="sat" style="--y:5%"><span style="--s:80px;--c:rgba(255,255,255,.35)"><img src="img/app_capcut.webp" alt="CapCut" title="CapCut"></span></div></div>
+  </div>
+  <div>
+    <div class="eyebrow reveal">02 · Toolkit</div>
+    <h2 class="h2 reveal">Skills <em>&amp;</em> Competencies</h2>
+    <h3 class="reveal">Technical</h3>
+    <div class="chips reveal">
+      <span class="chip">Basic Data Analysis</span><span class="chip">Microsoft Excel</span><span class="chip">Microsoft Word</span><span class="chip">Microsoft PowerPoint</span><span class="chip">Figma</span><span class="chip">Canva</span><span class="chip">CapCut</span>
+    </div>
+    <h3 class="reveal">Soft skills</h3>
+    <div class="chips reveal">
+      <span class="chip">Leadership</span><span class="chip">Teamwork</span><span class="chip">Communication</span><span class="chip">Problem Solving</span><span class="chip">Critical Thinking</span><span class="chip">Time Management</span><span class="chip">Adaptability</span><span class="chip">Organisational Management</span>
+    </div>
+  </div>
+</section>
+
+<!-- MISSIONS -->
+<section id="missions">
+  <div class="eyebrow reveal">03 · Mission Log</div>
+  <h2 class="h2 reveal">Organisation <em>&amp;</em> Project Experience</h2>
+  <div class="log">
+    <div class="log-grid">
+      <article class="mission reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Laboratory Assistant</h3><span class="when">2026</span></div>
+        <div class="org">Engineering Management Lab · Telkom University Surabaya · Academic Division</div>
+        <ul><li>Managed and supported academic operations and practicum sessions in the Engineering Management Laboratory.</li><li>Guided students through engineering course material and supervised practicum modules.</li></ul>
+      </div></article>
+      <article class="mission reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Secretary 1</h3><span class="when">2026</span></div>
+        <div class="org">Social Impact Project by Paragon</div>
+        <ul><li>Handled administration, proposal writing and official documentation for a social project with Paragon.</li><li>Coordinated communication between teams and stakeholders so project targets were met on time.</li></ul>
+      </div></article>
+      <article class="mission reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Event Division Committee</h3><span class="when">2026</span></div>
+        <div class="org">INTION 3.0 · Industrial Competition</div>
+        <ul><li>Designed the rundown and technical flow, and coordinated the execution of an industrial-level competition.</li></ul>
+      </div></article>
+      <article class="mission reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Creative PIC · ATP Division</h3><span class="when">2026</span></div>
+        <div class="org">PKKMB Telkom University Surabaya · New Student Orientation</div>
+        <ul><li>Arranged logistics, accommodation and technical equipment so the orientation ran smoothly.</li><li>Co-designed the main gate and Campus Expo together with the PDD team.</li><li>Created the floor layout for the Campus Expo.</li></ul>
+      </div></article>
+      <article class="mission reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Member</h3><span class="when">2026</span></div>
+        <div class="org">Novo Rangers Batch 4 by Paragon</div>
+        <ul><li>Took an active part in leadership development, youth initiatives and community service programmes.</li></ul>
+      </div></article>
+      <article class="mission reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Timekeeper</h3><span class="when">2026</span></div>
+        <div class="org">Tryout Campus Exhibition</div>
+        <ul><li>Controlled time allocation and rundown efficiency during the exam simulation and campus exhibition.</li></ul>
+      </div></article>
+      <article class="mission past reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Volunteer</h3><span class="when">2025</span></div>
+        <div class="org">Wepose Indonesia</div>
+        <ul><li>Contributed directly to humanitarian social projects and community volunteering.</li></ul>
+      </div></article>
+      <article class="mission past reveal"><span class="dot"></span><div class="card panel">
+        <div class="top"><h3>Member · First Aid &amp; Equipment Team</h3><span class="when">2022 – 2024</span></div>
+        <div class="org">SASPALA · SMA Negeri 1 Lendah</div>
+        <ul><li>Responsible for outdoor activity equipment management and emergency first-aid response.</li></ul>
+      </div></article>
+    </div>
+  </div>
+</section>
+
+<!-- AWARDS -->
+<section id="awards">
+  <div class="eyebrow reveal">04 · Constellation</div>
+  <h2 class="h2 reveal">Achievements <em>&amp;</em> Awards</h2>
+  <div class="ach">
+    <article class="award big panel reveal"><span class="spark"></span><div class="rank gold">FUNDED</div><h3>PKM-VGK Grant Recipient · Ministry / Telkom University</h3><div class="meta"><span class="cat">Academic</span><span>2026</span></div></article>
+    <article class="award big panel reveal"><span class="spark"></span><div class="rank bronze">3RD</div><h3>National Infographic Competition · Industrial Competition (INTION) 2.0</h3><div class="meta"><span class="cat">Design</span><span>2025</span></div></article>
+    <article class="award panel reveal"><span class="spark"></span><div class="rank silver">FINALIST</div><h3>PIMTUS Telkom University</h3><div class="meta"><span class="cat">Academic</span><span>2025</span></div></article>
+    <article class="award panel reveal"><span class="spark"></span><div class="rank gold">1ST</div><h3>Softball Tournament · PERBASASI Kulon Progo</h3><div class="meta"><span class="cat">Sport</span><span>2024</span></div></article>
+    <article class="award panel reveal"><span class="spark"></span><div class="rank bronze">3RD</div><h3>Mixed Pair · Bridge · POPDA DIY</h3><div class="meta"><span class="cat">Sport</span><span>2024</span></div></article>
+    <article class="award panel reveal"><span class="spark"></span><div class="rank gold">1ST</div><h3>Men's Team · Bridge · POPDA Kulon Progo</h3><div class="meta"><span class="cat">Sport</span><span>2023</span></div></article>
+    <article class="award panel reveal"><span class="spark"></span><div class="rank silver">2ND</div><h3>Men's Pair · Bridge · POPDA Kulon Progo</h3><div class="meta"><span class="cat">Sport</span><span>2023</span></div></article>
+    <article class="award panel reveal"><span class="spark"></span><div class="rank silver">2ND</div><h3>Men's Team · Bridge · POPDA DIY</h3><div class="meta"><span class="cat">Sport</span><span>2023</span></div></article>
+    <article class="award wide panel reveal"><span class="spark"></span><div class="rank">PARTICIPANT</div><h3>National Science Olympiad (OSN) in Informatics · Kulon Progo Regency</h3><div class="meta"><span class="cat">Academic</span><span>2023</span></div></article>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section id="works">
+  <div class="eyebrow reveal">05 · Payload</div>
+  <h2 class="h2 reveal">Selected <em>Works</em></h2>
+  <p class="lead reveal">Social media content, product concepts, posters and short videos, made with Figma, Canva and CapCut. Click any piece to see it larger.</p>
+  <div class="filters" role="group" aria-label="Filter works">
+    <button type="button" data-f="all" aria-pressed="true">All</button>
+    <button type="button" data-f="content" aria-pressed="false">Social content</button>
+    <button type="button" data-f="product" aria-pressed="false">Product design</button>
+    <button type="button" data-f="poster" aria-pressed="false">Posters</button>
+    <button type="button" data-f="video" aria-pressed="false">Video</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="eyebrow reveal">06 · Transmission</div>
+  <div class="thanks">
+    <div>
+      <h2 class="big-ty reveal">Thank<br><span class="out">You</span></h2>
+      <p class="lead reveal">I'm looking for an internship where I can bring organised engineering thinking and a designer's eye to a real team. Let's talk.</p>
+    </div>
+    <img class="reveal" src="img/thanks.webp" alt="Bima with hands on his temples, thinking">
+  </div>
+  <div class="channels">
+    <a class="channel panel reveal" href="mailto:bimasurya1032007@gmail.com" data-copy="bimasurya1032007@gmail.com"><span class="k">Email · click to copy</span><span class="v">bimasurya1032007@gmail.com</span></a>
+    <a class="channel panel reveal" href="https://wa.me/6285712715515"><span class="k">WhatsApp</span><span class="v">+62 857-1271-5515</span></a>
+    <a class="channel panel reveal" href="https://www.instagram.com/bimasurya.3/"><span class="k">Instagram</span><span class="v">@bimasurya.3</span></a>
+    <a class="channel panel reveal" href="https://www.tiktok.com/@bimsurr.3"><span class="k">TikTok</span><span class="v">@bimsurr.3</span></a>
+    <a class="channel panel reveal" href="https://www.linkedin.com/search/results/people/?keywords=Bima%20Surya%20Adiraja"><span class="k">LinkedIn</span><span class="v">Bima Surya Adiraja</span></a>
+  </div>
+</section>
+</main>
+
+<footer><span>© 2026 Bima Surya Adiraja</span><span>Designed for launch · Surabaya, Indonesia</span></footer>
+
+<div id="lb" role="dialog" aria-modal="true" aria-label="Work preview"><button type="button" id="lbx">Close ✕</button><figure><img id="lbimg" alt=""><figcaption id="lbcap"></figcaption></figure></div>
+<div class="toast" id="toast">Email copied</div>
+
+<script>
+/* ===== Edit your works here. For videos, paste the Instagram/TikTok link into "link". ===== */
+const WORKS=[
+  {img:"pkm3.jpg",cat:"content",title:"“Jadi?” · AI energy carousel",tool:"Figma",desc:"Instagram carousel for a PKM campaign on AI's hidden energy cost."},
+  {img:"pkm4.jpg",cat:"content",title:"“Masih penasaran?” · CTA slide",tool:"Figma",desc:"Closing slide that sends readers to @nbcloud.id."},
+  {img:"pkm2.webp",cat:"content",title:"“Tahu gak sih?” · Team cover",tool:"Figma",desc:"Hook slide featuring the PKM team."},
+  {img:"pkm1.jpg",cat:"content",title:"Fun fact slide",tool:"Figma",desc:"Every question you ask AI makes a data-centre server use electricity."},
+  {img:"jersey3.webp",cat:"product",title:"Sports jersey · Green",tool:"Figma",desc:"Personal jersey concept, front and back with number.",light:true},
+  {img:"jersey1.webp",cat:"product",title:"Sports jersey · Rose",tool:"Figma",desc:"Personal jersey concept with “New Look” chest mark.",light:true},
+  {img:"jersey2.webp",cat:"product",title:"Graphic T-shirt",tool:"Figma",desc:"Personal T-shirt concept with sparkle and splash graphics.",light:true},
+  {img:"snack1.jpg",cat:"poster",title:"Keripik Singkong Seblak",tool:"Figma",desc:"Product poster for a spicy cassava-chip snack."},
+  {img:"snack2.jpg",cat:"poster",title:"Dirgahayu Indonesia",tool:"Figma",desc:"Independence Day calendar visual for 17 August."},
+  {img:"cr1.jpg",cat:"poster",title:"“Desain” recruitment poster",tool:"Canva",desc:"Open-recruitment poster for a design head position."},
+  {img:"cr2.jpg",cat:"poster",title:"“Kepoin Yuk!”",tool:"Canva",desc:"Photo-collage teaser poster for social media."},
+  {img:"cr3.jpg",cat:"poster",title:"“Cerita Hari Ini”",tool:"Canva",desc:"Story-style moodboard collage with flat-lay styling."},
+  {img:"vid1.jpg",cat:"video",title:"Short video · OTT regulation",tool:"CapCut",desc:"Explainer reel on digital platform rules.",link:"https://www.instagram.com/reel/DWN7-hik6un/"},
+  {img:"vid2.jpg",cat:"video",title:"Short video · Digital sovereignty",tool:"CapCut",desc:"Explainer reel on Indonesia's digital sovereignty.",link:"https://www.instagram.com/reel/DWN7eDEk88A/"},
+  {img:"vid3.jpg",cat:"video",title:"Short video · AI research tools",tool:"CapCut",desc:"Reel introducing an AI research assistant.",link:""},
+  {img:"vid4.jpg",cat:"video",title:"Short video · “Tinggi”",tool:"CapCut",desc:"Talking-head reel with bold kinetic captions.",link:""}
+];
+
+const grid=document.getElementById('grid');
+grid.innerHTML=WORKS.map((w,i)=>`
+  <figure class="work reveal" data-cat="${w.cat}" data-i="${i}" tabindex="0">
+    <div class="frame${w.light?' light':''}"><img decoding="async" src="img/${w.img}" alt="${w.title}"><span class="shine"></span>${w.cat==='video'?'<span class="play"></span>':''}</div>
+    <figcaption class="cap"><div><h3>${w.title}</h3><p>${w.desc}</p>${w.cat==='video'?(w.link?`<a class="vlink" href="${w.link}" target="_blank" rel="noopener">Watch on Instagram ↗</a>`:'<span class="vlink soon">Link coming soon</span>'):''}</div><span>${w.tool}</span></figcaption>
+  </figure>`).join('');
+
+/* filters */
+document.querySelectorAll('.filters button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.filters button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const f=b.dataset.f;
+  grid.querySelectorAll('.work').forEach(w=>w.classList.toggle('hide',f!=='all'&&w.dataset.cat!==f));
+}));
+
+/* lightbox */
+const lb=document.getElementById('lb'),lbimg=document.getElementById('lbimg'),lbcap=document.getElementById('lbcap');
+function openLB(i){const w=WORKS[i];lbimg.src='img/'+w.img;lbimg.alt=w.title;lbcap.textContent=w.title+' · '+w.tool+' — '+w.desc;lb.classList.add('open');document.getElementById('lbx').focus()}
+function closeLB(){lb.classList.remove('open')}
+grid.addEventListener('click',e=>{if(e.target.closest('a'))return;const w=e.target.closest('.work');if(w)openLB(w.dataset.i)});
+grid.addEventListener('keydown',e=>{if(e.key==='Enter'){const w=e.target.closest('.work');if(w)openLB(w.dataset.i)}});
+lb.addEventListener('click',e=>{if(e.target===lb||e.target.id==='lbx')closeLB()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeLB()});
+
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine=matchMedia('(pointer:fine)').matches;
+
+/* 3D tilt on works */
+if(fine&&!reduce){grid.querySelectorAll('.work').forEach(el=>{
+  el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    el.style.transform=`perspective(800px) rotateY(${(x-.5)*12}deg) rotateX(${(.5-y)*12}deg) translateZ(0)`;
+    el.style.setProperty('--mx',x*100+'%');el.style.setProperty('--my',y*100+'%')});
+  el.addEventListener('mouseleave',()=>el.style.transform='')})}
+
+/* reveal on scroll */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%4)*70+'ms';io.observe(el)});
+
+/* count up */
+const cio=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,to=+el.dataset.count,d=+(el.dataset.dec||0),t0=performance.now();
+  const step=t=>{const p=Math.min(1,(t-t0)/1400),v=to*(1-Math.pow(1-p,3));el.textContent=v.toFixed(d);if(p<1)requestAnimationFrame(step)};
+  reduce?el.textContent=to.toFixed(d):requestAnimationFrame(step);cio.unobserve(el)}),{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+
+/* typewriter */
+const roles=["Industrial Engineering Student","Aspiring Graphic Designer","Content Creator & Video Editor","Event & Project Organiser"];
+const typeEl=document.getElementById('type');
+if(!reduce){let r=0,c=roles[0].length,del=true;
+  (function tick(){const s=roles[r];
+    if(del){c--;if(c<=0){del=false;r=(r+1)%roles.length}}else{c++;if(c>=roles[r].length){del=true;typeEl.textContent=roles[r];return setTimeout(tick,2200)}}
+    typeEl.textContent=roles[r].slice(0,Math.max(c,0));setTimeout(tick,del?35:70)})();
+}
+
+/* clock (WIB) */
+function clock(){try{document.getElementById('time').textContent=new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'})}catch(e){}}
+clock();setInterval(clock,20000);
+
+/* fuel bar + active nav */
+const fuel=document.getElementById('fuel'),links=[...document.querySelectorAll('nav ul a')];
+addEventListener('scroll',()=>{const h=document.documentElement;fuel.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100+'%';
+  let cur='';document.querySelectorAll('section[id]').forEach(s=>{if(s.getBoundingClientRect().top<innerHeight*.4)cur=s.id});
+  links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur))},{passive:true});
+
+/* copy email */
+const toast=document.getElementById('toast');
+document.querySelectorAll('[data-copy]').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();const v=a.dataset.copy;
+  const done=m=>{toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800)};
+  try{navigator.clipboard.writeText(v).then(()=>done('Email copied'),()=>done(v))}catch(err){done(v)}}));
+
+/* cursor glow */
+const cur=document.getElementById('cursor');
+if(fine&&!reduce){addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'},{passive:true})}else cur.style.display='none';
+
+/* starfield: warp-in, mouse parallax, shooting stars */
+(function(){
+  const cv=document.getElementById('stars'),ctx=cv.getContext('2d');let W,H,D=Math.min(devicePixelRatio||1,2),stars=[],shoots=[];
+  let mx=0,my=0,tx=0,ty=0,warp=reduce?0:1;
+  function size(){W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+    const n=Math.min(700,Math.floor(W*H/2600));stars=[];for(let i=0;i<n;i++)stars.push({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random(),tw:Math.random()*6.28})}
+  size();addEventListener('resize',size);
+  if(fine)addEventListener('mousemove',e=>{tx=(e.clientX/W-.5);ty=(e.clientY/H-.5)},{passive:true});
+  let last=performance.now();
+  function frame(t){const dt=Math.min(50,t-last);last=t;
+    mx+=(tx-mx)*.04;my+=(ty-my)*.04;warp*=.965;
+    const sy=scrollY*.0004;
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      s.z-=(0.00012+warp*.02)*dt/16;if(s.z<=0.02){s.z=1;s.x=Math.random()*2-1;s.y=Math.random()*2-1}
+      const k=0.55/s.z,px=W/2+(s.x*k*W/2)-mx*60*(1-s.z),py=H/2+((s.y-sy*(1-s.z))*k*H/2)-my*60*(1-s.z);
+      if(px<0||px>W||py<0||py>H)continue;
+      s.tw+=.03;const a=Math.min(1,(1-s.z)*1.3)*(.7+.3*Math.sin(s.tw)),r=(1-s.z)*1.8+.2;
+      if(warp>.05){const k2=0.55/(s.z+warp*.06),qx=W/2+(s.x*k2*W/2),qy=H/2+(s.y*k2*H/2);
+        ctx.strokeStyle=`rgba(200,220,255,${a})`;ctx.lineWidth=r;ctx.beginPath();ctx.moveTo(qx,qy);ctx.lineTo(px,py);ctx.stroke()}
+      else{ctx.fillStyle=s.z<.25?`rgba(255,190,170,${a})`:`rgba(220,230,255,${a})`;ctx.beginPath();ctx.arc(px,py,r,0,6.28);ctx.fill()}
+    }
+    if(!reduce&&Math.random()<.006)shoots.push({x:Math.random()*W,y:Math.random()*H*.5,vx:-(6+Math.random()*6),vy:3+Math.random()*3,l:1});
+    shoots=shoots.filter(s=>s.l>0);for(const s of shoots){const g=ctx.createLinearGradient(s.x,s.y,s.x-s.vx*12,s.y-s.vy*12);
+      g.addColorStop(0,`rgba(255,255,255,${s.l})`);g.addColorStop(1,'rgba(255,255,255,0)');ctx.strokeStyle=g;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x-s.vx*12,s.y-s.vy*12);ctx.stroke();
+      s.x+=s.vx;s.y+=s.vy;s.l-=.012}
+    if(!reduce)requestAnimationFrame(frame)}
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
